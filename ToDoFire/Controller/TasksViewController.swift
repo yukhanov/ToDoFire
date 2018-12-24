@@ -31,18 +31,36 @@ class TasksViewController: UIViewController, UITableViewDelegate, UITableViewDat
         ref = Database.database().reference(withPath: "users").child(user.uid).child("tasks")
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        ref.observe(.value) { [weak self] (snapshot) in
+            var _tasks = Array<Task>()
+            for item in snapshot.children {
+                let task = Task(snapshot: item as! DataSnapshot)
+                _tasks.append(task)
+            }
+            self?.tasks = _tasks
+            self?.tableView.reloadData()
+        }
+    }
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        ref.removeAllObservers()
+    }
+    
     @IBOutlet weak var tableView: UITableView!
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
         cell.backgroundColor = .clear
-        cell.textLabel?.text = "This is cell number \(indexPath.row)"
+        let taskTitle = tasks[indexPath.row].title
+        cell.textLabel?.text = taskTitle
         cell.textLabel?.textColor = .white
         return cell
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 5
+        return tasks.count
     }
     
     @IBAction func addTapped(_ sender: UIBarButtonItem) {
