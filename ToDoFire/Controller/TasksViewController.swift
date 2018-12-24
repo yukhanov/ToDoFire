@@ -11,7 +11,7 @@ import Firebase
 
 class TasksViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
-    var user: User!
+    var user: FUser!
     var ref: DatabaseReference!
     var tasks = Array<Task>()
 
@@ -27,7 +27,7 @@ class TasksViewController: UIViewController, UITableViewDelegate, UITableViewDat
     override func viewDidLoad() {
         super.viewDidLoad()
         guard let currentUser = Auth.auth().currentUser else { return }
-        user = User(user: currentUser)
+        user = FUser(user: currentUser)
         ref = Database.database().reference(withPath: "users").child(user.uid).child("tasks")
     }
     
@@ -51,6 +51,9 @@ class TasksViewController: UIViewController, UITableViewDelegate, UITableViewDat
         let save = UIAlertAction(title: "Save", style: .default) { [weak self] _ in
             guard let textField = alertController.textFields?.first, textField.text != "" else { return }
             let task = Task(title: textField.text!, userId: (self?.user.uid)!)
+            
+            print(task)
+            
             let taskRef = self?.ref.child(task.title.lowercased())
             taskRef?.setValue(task.convertToDictionary())
         }

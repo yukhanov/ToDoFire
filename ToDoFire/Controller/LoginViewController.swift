@@ -15,9 +15,11 @@ class LoginViewController: UIViewController {
     @IBOutlet weak var emailTextField: UITextField!
     @IBOutlet weak var passTextField: UITextField!
     let segueIdentifier = "tasksSegue"
+    var ref: DatabaseReference!
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        ref = Database.database().reference(withPath: "users")
         warnLabel.alpha = 0
         Auth.auth().addIDTokenDidChangeListener { [weak self] (auth, user) in
             if user != nil {
@@ -66,16 +68,14 @@ class LoginViewController: UIViewController {
         }
         Auth.auth().createUser(withEmail: email, password: password) { (user, error) in
           
-            if error == nil {
-                if user != nil {
-                    
-                } else {
-                    print("User isn't created")
-                }
+         
+            
+            guard error == nil, user != nil else {
                 
-            } else {
                 print(error!.localizedDescription)
+                return
             }
+            
             
         }
     }

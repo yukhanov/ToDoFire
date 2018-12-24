@@ -9,11 +9,11 @@
 import Foundation
 import Firebase
 
-struct User {
+struct FUser {
     let uid: String
     let email: String
     
-    init(user: Firebase.User) {
+    init(user: User) {
         self.uid = user.uid
         self.email = user.email!
     }
