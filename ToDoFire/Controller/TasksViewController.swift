@@ -56,11 +56,37 @@ class TasksViewController: UIViewController, UITableViewDelegate, UITableViewDat
         let taskTitle = tasks[indexPath.row].title
         cell.textLabel?.text = taskTitle
         cell.textLabel?.textColor = .white
+        let task = tasks[indexPath.row]
+        let isCompleted = task.completed
+        toogleCompletion(cell, isCompleted: isCompleted)
         return cell
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return tasks.count
+    }
+    
+    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        return true
+    }
+    
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
+            let task = tasks[indexPath.row]
+            task.ref?.removeValue()
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        guard let cell = tableView.cellForRow(at: indexPath) else { return }
+        let task = tasks[indexPath.row]
+        let isCompleted = !task.completed
+        toogleCompletion(cell, isCompleted: isCompleted)
+        task.ref?.updateChildValues(["completed": isCompleted])
+    }
+    
+    func toogleCompletion(_ cell: UITableViewCell, isCompleted: Bool) {
+        cell.accessoryType = isCompleted ? .checkmark : .none
     }
     
     @IBAction func addTapped(_ sender: UIBarButtonItem) {
